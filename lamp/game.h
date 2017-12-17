@@ -48,7 +48,6 @@ void game_update() {
 };
 
 
-float fmod(float x, float y) { return x - (round(x/y)*y); }
 
 
 void game_bounce() {

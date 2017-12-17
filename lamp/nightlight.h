@@ -4,8 +4,9 @@
 #ifndef __NIGHTLIGHT_H__
 #define __NIGHTLIGHT_H__
 
-#define NIGHT_SPEED (PI/5000)   //How fast does it progress between colours?
-#define NIGHT_BRIGHTNESS (32.0) //How bright does it get? Float, max is 102.0
+#define NIGHT_SPEED (PI/10000.0)  //How fast does it progress between colours?
+#define NIGHT_SPREAD (0.05/NIGHT_SPEED) //How far apart are the LEDs, temporally?
+#define NIGHT_BRIGHTNESS (0.2)   //How bright does it get?
 
 void nightlight_begin() {
   mode = Mode::Nightlight;
@@ -15,14 +16,14 @@ void nightlight_begin() {
  * Animate the LEDs for a nightlight effect
  */
 void nightlight_update() {
-  float t = millis()*NIGHT_SPEED;  
-  for(uint8_t i=0;i<PIXEL_COUNT;i++) {
-    t+=0.1;
-    leds.SetPixelColor(i, RgbColor(
-      (exp(sin(t)) - 0.36787944)*NIGHT_BRIGHTNESS,
-      (exp(sin(t+PI/3)) - 0.36787944)*NIGHT_BRIGHTNESS,
-      (exp(sin(t+2*PI/3)) - 0.36787944)*NIGHT_BRIGHTNESS
-    ));
+  uint32_t t = millis();  
+  for (uint8_t i=0;i<PIXEL_COUNT;i++) {
+    float h,s,l;
+    h=0.5-0.5*sin(t*NIGHT_SPEED*0.9);
+    s=0.5-0.5*sin(t*NIGHT_SPEED);
+    l=NIGHT_BRIGHTNESS;
+    leds.SetPixelColor(i,HslColor(h,s,l));
+    t+=NIGHT_SPREAD;
   }
   leds.Show();
 }

@@ -1,5 +1,5 @@
 #include <NeoPixelBus.h> //From https://github.com/Makuna/NeoPixelBus/wiki
-#include <NeoPixelBrightnessBus.h> //From https://github.com/Makuna/NeoPixelBus/wiki
+//#include <NeoPixelBrightnessBus.h> //From https://github.com/Makuna/NeoPixelBus/wiki
 
 //====================================================
 // Shared LED stuff
@@ -8,12 +8,14 @@
 #define PIXEL_COLS (3) //and three sides/columns
 #define PIXEL_COUNT (PIXEL_ROWS*PIXEL_COLS)
 
-NeoPixelBrightnessBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
+//NeoPixelBrightnessBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
 NeoTopology<RowMajorAlternatingLayout> topo(PIXEL_COLS, PIXEL_ROWS);
 
 //====================================================
 // Program components
 
+float _fmod(float x, float y) { return x - (round(x/y)*y); }
 enum class Mode { Game, Nightlight };
 Mode mode;
 
@@ -49,10 +51,19 @@ void setup()
 //====================================================
 // Main program loop
 
+ButtonEvent last;
 void loop() {
   ButtonEvent evt = button_check();
+  //if (evt != ButtonEvent::None) last = evt;
 
-  switch(mode) {
+  //if (last != ButtonEvent::Released) {
+    nightlight_update(); 
+  //} else {
+  //  leds.ClearTo(RgbColor(0));
+  //  leds.Show();
+  //}
+}
+/*  switch(mode) {
     case Mode::Nightlight:
       nightlight_update();
       if (evt==ButtonEvent::Pressed) {
@@ -67,4 +78,4 @@ void loop() {
       }
       break;
   }
-}
+}*/
