@@ -15,12 +15,17 @@ NeoTopology<RowMajorAlternatingLayout> layout(PIXEL_ROWS,PIXEL_COLS);
 //====================================================
 // Program components
 
-enum class Mode { Game, Nightlight };
-Mode mode;
+class Mode {
+  public: 
+  virtual void begin();
+  virtual void update();
+  float fmod(float x, float y) { return x - (round(x/y)*y); }
+};
+Mode *mode;
 
 #include "buttons.h"
-#include "nightlight.h"
-#include "game.h"
+#include "technicolor.h"
+#include "bounce.h"
 
 //====================================================
 // Initialisation
@@ -42,8 +47,7 @@ void setup()
   buttons.setup();
 
   //Start with the nightlight
-  //nightlight_begin();
-  game.begin();
+  mode = &mode_bounce;
   
   Serial.println("ready");
 }
@@ -56,7 +60,7 @@ void loop() {
   ButtonEvent evt = buttons.check();
   if (evt != ButtonEvent::None) last = evt;
 
-  switch(mode) {
+  /*switch(mode) {
     case Mode::Nightlight:
       nightlight.update();
       if (evt==ButtonEvent::Pressed) {
@@ -64,12 +68,12 @@ void loop() {
       }
       break;
     
-    case Mode::Game:*/
+    case Mode::Game:* /
       game.update();
       game.swing(evt);
       if (game.gameover) {
         nightlight.begin();
       }
       //break;
-    leds.Show();
+    leds.Show();*/
 }
