@@ -9,49 +9,82 @@
 //
 // Miss and the game is over.
 //====================================================
-#ifndef __GAME_H__
-#define __GAME_H__
+#ifndef _GAME_H__
+#define _GAME_H__
 
-float game_d, game_v, game_a; //Current displacement, velocity, acceleration
-float game_u;                 //Initial velocity, dynamically set after each 'bounce'
-bool game_over; //Becomes set when the game is over
+#define GAME_TICK_MS (20)     // Run a frame each 'tick'
+#define GAME_INITIAL_U (0.1)  // Initial upward velocity of the pixel
 
-
-//uint32_t =
-
-
-void game_begin() {
-  game_d = 0;
-  game_u = 0.2;
-  game_v = game_u;
-  game_a = (game_u*game_u) / (2*(PIXEL_COLS-1)); //Choose acceleration that gets it to the top
-
-  mode = Mode::Game;
-}
-
-void game_update() {
-  //float t = millis();
-  float r = (millis()/1000)%6;
+class Game {
+  public:
+  float u,d,v,a;  // Initial velocity, current displacement, velocity, acceleration
+  bool gameover;  // Is the game finished?
+  bool hit;       // Did the player hit the pixel successfully?
+  uint8_t score;  // How many times was it bounced?
+  float hue,sat;  // Current colour
   
- /* for(uint8_t c=0;
-  
-  for(uint8_t i=0;i<PIXEL_COUNT;i++) {
-    t+=0.1;
-    leds.SetPixelColor(i, RgbColor(
-      (exp(sin(t)) - 0.36787944)*NIGHT_BRIGHTNESS,
-      (exp(sin(t+PI/3)) - 0.36787944)*NIGHT_BRIGHTNESS,
-      (exp(sin(t+2*PI/3)) - 0.36787944)*NIGHT_BRIGHTNESS
-    ));
+  float fmod(float x, float y) { return x - (round(x/y)*y); }
+
+  /**
+   * Start a new game
+   */
+  void begin() {
+    u = GAME_INITIAL_U;
+    d = 0;
+    v = u;
+    a = -(u*u) / (2*(PIXEL_ROWS-1)); //Physics; what acceleration stops at the top? v^2 = u^2 + 2*a*s
+    gameover = false;
+    hit = false;
+    score = 0;
+    mode = Mode::Game;
   }
-  leds.Show();*/
+
+  /**
+   * Run the game loop
+   */
+  void update() {
+    //Limit the update rate to the given framerate - return early if called too soon.
+    static uint32_t prev;
+    if (millis()-prev > GAME_TICK_MS) prev=millis(); else return;
+
+    //Move the pixel
+    d+=v+=a;
+
+    //Update LEDs to show its location 
+    //(d is a float so it's approximated, pixels to either side are lit to smooth it)
+    for(uint8_t r=0;r<PIXEL_ROWS;r++) {      
+      HsbColor color = HsbColor(
+        fmod(0.13*score,1.0),
+        constrain(0.5+0.03*score,0.0,1.0),
+        constrain(1.0-abs(d-r),0.0,1.0)
+      );
+      for(uint8_t c=0;c<PIXEL_COLS;c++) leds.SetPixelColor(layout.Map(r,c), color);      
+    }    
+
+    //Bounce?
+    if (d<0 && hit) {
+      Serial.println("BOUNCE");
+      hit = false;
+      d*=-1; 
+      v*=-1;
+      score++;
+    }
+  }
+
+  /**
+   * Swing at the ball.
+   * If the button was pressed in the right location, register that it 'hit'
+   */
+   void swing(ButtonEvent evt) {
+    if (evt==ButtonEvent::Pressed) {
+      Serial.print("PRESSED "); Serial.println(d, 2);
+      if (d<1.2) {
+        Serial.println("HIT");
+        hit = true;
+      }
+    }
+   }
+   
+} game;
   
-};
-
-
-
-
-void game_bounce() {
-  fmod(1.0,2.0);
-}
-
 #endif

@@ -10,12 +10,11 @@
 
 //NeoPixelBrightnessBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
-NeoTopology<RowMajorAlternatingLayout> topo(PIXEL_COLS, PIXEL_ROWS);
+NeoTopology<RowMajorAlternatingLayout> layout(PIXEL_ROWS,PIXEL_COLS);
 
 //====================================================
 // Program components
 
-float _fmod(float x, float y) { return x - (round(x/y)*y); }
 enum class Mode { Game, Nightlight };
 Mode mode;
 
@@ -40,10 +39,11 @@ void setup()
   leds.Show();    
 
   //Button
-  button_setup();
+  buttons.setup();
 
   //Start with the nightlight
-  nightlight_begin();
+  //nightlight_begin();
+  game.begin();
   
   Serial.println("ready");
 }
@@ -51,31 +51,25 @@ void setup()
 //====================================================
 // Main program loop
 
-ButtonEvent last;
 void loop() {
-  ButtonEvent evt = button_check();
-  //if (evt != ButtonEvent::None) last = evt;
+  static ButtonEvent last;
+  ButtonEvent evt = buttons.check();
+  if (evt != ButtonEvent::None) last = evt;
 
-  //if (last != ButtonEvent::Released) {
-    nightlight_update(); 
-  //} else {
-  //  leds.ClearTo(RgbColor(0));
-  //  leds.Show();
-  //}
-}
-/*  switch(mode) {
+  switch(mode) {
     case Mode::Nightlight:
-      nightlight_update();
+      nightlight.update();
       if (evt==ButtonEvent::Pressed) {
-        game_begin();
+        game.begin();
       }
       break;
     
-    case Mode::Game:
-      game_update();
-      if (game_over) {
-        nightlight_begin();
+    case Mode::Game:*/
+      game.update();
+      game.swing(evt);
+      if (game.gameover) {
+        nightlight.begin();
       }
-      break;
-  }
-}*/
+      //break;
+    leds.Show();
+}
