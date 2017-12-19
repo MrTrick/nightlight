@@ -8,8 +8,15 @@
 #define __ANTS_H__
 
 
-class AntsMode: public Mode {
-
-}
+class ModeAnts: public Mode {
+  public:
+  
+  void begin() {
+    
+  }
+  void update() {
+    
+  }
+} mode_ants;
 
 #endif

@@ -13,7 +13,7 @@
 #define BOUNCE_TICK_MS (20)     // Run a frame each 'tick'
 #define BOUNCE_INITIAL_U (0.1)  // Initial upward velocity of the pixel
 
-class Bounce: public Mode {
+class ModeBounce: public Mode {
   protected:
   float u,d,v,a;  // Initial velocity, current displacement, velocity, acceleration
   uint8_t score;  // How many times was it bounced?

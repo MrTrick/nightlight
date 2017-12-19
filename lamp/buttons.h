@@ -1,8 +1,8 @@
 #ifndef __BUTTONS_H__
 #define __BUTTONS_H__
 
-#define BTN_TICK_MS (50)   //How often should we check the pin state?
-#define BTN_HOLD_MS (3000) //How long is a button held down before triggering 'held'?
+#define BTN_TICK_MS (100)  //How often should we check the pin state?
+#define BTN_HOLD_MS (2000) //How long is a button held down before triggering 'held'?
 
 #define BTN_PIN_COM D1     //Common ground line (because splicing pins was a pain)
 #define BTN_PIN_A D2       //Where are the buttons connected?

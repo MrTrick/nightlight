@@ -1,5 +1,4 @@
-#include <NeoPixelBus.h> //From https://github.com/Makuna/NeoPixelBus/wiki
-//#include <NeoPixelBrightnessBus.h> //From https://github.com/Makuna/NeoPixelBus/wiki
+#include <NeoPixelBrightnessBus.h> //From https://github.com/Makuna/NeoPixelBus/wiki
 
 //====================================================
 // Shared LED stuff
@@ -8,24 +7,19 @@
 #define PIXEL_COLS (3) //and three sides/columns
 #define PIXEL_COUNT (PIXEL_ROWS*PIXEL_COLS)
 
-//NeoPixelBrightnessBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
-NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
+NeoPixelBrightnessBus<NeoGrbFeature, Neo800KbpsMethod> leds(PIXEL_COUNT); 
 NeoTopology<RowMajorAlternatingLayout> layout(PIXEL_ROWS,PIXEL_COLS);
 
 //====================================================
 // Program components
 
-class Mode {
-  public: 
-  virtual void begin();
-  virtual void update();
-  float fmod(float x, float y) { return x - (round(x/y)*y); }
-};
-Mode *mode;
-
 #include "buttons.h"
-#include "technicolor.h"
-#include "bounce.h"
+#include "mode.h"
+#include "mode_ants.h"
+#include "mode_bounce.h"
+#include "mode_technicolor.h"
+
+Mode *mode;
 
 //====================================================
 // Initialisation
@@ -46,9 +40,13 @@ void setup()
   //Button
   buttons.setup();
 
-  //Start with the nightlight
-  mode = &mode_bounce;
-  
+  //Set initial mode and link modes together in order
+  mode_ants.next = &mode_bounce;
+  mode_bounce.next = &mode_technicolor;
+  mode_technicolor.next = &mode_ants;   
+  mode = &mode_ants;
+  mode->begin();
+    
   Serial.println("ready");
 }
 
@@ -56,9 +54,11 @@ void setup()
 // Main program loop
 
 void loop() {
-  static ButtonEvent last;
+  //Change mode?
   ButtonEvent evt = buttons.check();
-  if (evt != ButtonEvent::None) last = evt;
+  if (evt == ButtonEvent::Released) {
+    mode = mode->next;
+  }
 
   /*switch(mode) {
     case Mode::Nightlight:
@@ -77,3 +77,5 @@ void loop() {
       //break;
     leds.Show();*/
 }
+
+//}; //Namespace

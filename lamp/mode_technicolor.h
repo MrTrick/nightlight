@@ -8,7 +8,7 @@
 #define TECH_SPREAD (0.05/TECH_SPEED) //How far apart are the LEDs, temporally?
 #define TECH_BRIGHTNESS (0.2)   //How bright does it get?
 
-class Technicolor: public Mode {
+class ModeTechnicolor: public Mode {
   public:
   /**
    * Start technicolor mode
@@ -18,7 +18,7 @@ class Technicolor: public Mode {
   /**
    * Animate the LEDs for a technicolor effect
    */
-  void technicolor_update() {
+  void update() {
     uint32_t t = millis();  
     for (uint8_t i=0;i<PIXEL_COUNT;i++) {
       float h,s,l;
