@@ -18,6 +18,7 @@ NeoTopology<RowMajorAlternatingLayout> layout(PIXEL_ROWS,PIXEL_COLS);
 #include "mode_ants.h"
 #include "mode_bounce.h"
 #include "mode_technicolor.h"
+#include "mode_off.h"
 
 Mode *mode;
 
@@ -43,11 +44,12 @@ void setup()
   //Set initial mode and link modes together in order
   mode_ants.next = &mode_bounce;
   mode_bounce.next = &mode_technicolor;
-  mode_technicolor.next = &mode_ants;   
+  mode_technicolor.next = &mode_ants;
+  mode_off.next = &mode_ants;
   mode = &mode_ants;
   mode->begin();
     
-  Serial.println("ready");
+  Serial.println("Nightlight ready");
 }
 
 //====================================================
@@ -57,25 +59,19 @@ void loop() {
   //Change mode?
   ButtonEvent evt = buttons.check();
   if (evt == ButtonEvent::Released) {
+    Serial.println("Change mode");
     mode = mode->next;
+    mode->begin();
+  } else if (evt == ButtonEvent::Held) {
+    Serial.print("Switching off...");
+    mode = &mode_off;
+    mode->begin();
+    //Wait for the button to be released before continuing.
+    do yield(); while(buttons.check() != ButtonEvent::Released);
+    Serial.println("done.");
   }
 
-  /*switch(mode) {
-    case Mode::Nightlight:
-      nightlight.update();
-      if (evt==ButtonEvent::Pressed) {
-        game.begin();
-      }
-      break;
-    
-    case Mode::Game:* /
-      game.update();
-      game.swing(evt);
-      if (game.gameover) {
-        nightlight.begin();
-      }
-      //break;
-    leds.Show();*/
+  //Animate
+  mode->update();
+  leds.Show();
 }
-
-//}; //Namespace

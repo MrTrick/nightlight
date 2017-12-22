@@ -20,10 +20,13 @@ class ModeBounce: public Mode {
   float hue,sat;  // Current colour
 
   public:
+  
   /**
    * Start a new bounce
    */
   void begin() {
+    Serial.println("Mode: Bounce");
+    
     u = BOUNCE_INITIAL_U;
     d = 0;
     v = u;
@@ -46,11 +49,13 @@ class ModeBounce: public Mode {
     //(d is a float so it's approximated, pixels to either side are lit to smooth it)
     for(uint8_t r=0;r<PIXEL_ROWS;r++) {      
       HsbColor color = HsbColor(
-        fmod(0.13*score,1.0),
-        constrain(0.5+0.03*score,0.0,1.0),
-        constrain(1.0-abs(d-r),0.0,1.0)
+        fmod(0.13*score,1.0),                 //Wrap around
+        tri(0.5+0.03*score),                  //Get more vibrant, then less, then more
+        constrain(1.0-abs(d-r),0.0,1.0)       //Brightness indicates where the bouncing pixel is
       );
-      for(uint8_t c=0;c<PIXEL_COLS;c++) leds.SetPixelColor(layout.Map(r,c), color);      
+      for(uint8_t c=0;c<PIXEL_COLS;c++) {     //Set every pixel in the row
+        leds.SetPixelColor(layout.Map(r,c), color);      
+      }
     }    
 
     //Bounce?
