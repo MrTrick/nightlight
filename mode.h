@@ -29,7 +29,7 @@ class Mode {
    * Utility: Floating-point modulus function.
    * (not defined correctly by esp8266 core)
    */
-  float fmod(float x, float y) { return x - (round(x/y)*y); }
+  float fmod(float x, float y) { return x - (floor(x/y)*y); }
 
   /**
    * Utility: Return a triangle wave. 

@@ -33,8 +33,8 @@ public:
     pinMode(BTN_PIN_COM, OUTPUT);
     digitalWrite(BTN_PIN_COM, LOW);
     
-//    pinMode(BTN_PIN_A, INPUT_PULLUP);
-//    pinMode(BTN_PIN_B, INPUT_PULLUP);
+    //pinMode(BTN_PIN_A, INPUT_PULLUP);
+    //pinMode(BTN_PIN_B, INPUT_PULLUP);
     pinMode(BTN_PIN_C, INPUT_PULLUP);
   
     timer_pressed = 0; //Use zero to indicate button not pressed.
@@ -53,10 +53,10 @@ public:
     if (now - prev > BTN_TICK_MS) prev=now; else return ButtonEvent::None;
     
     //Is 'the' button pushed down? Take at least two out of three
-//    bool a = digitalRead(BTN_PIN_A)==LOW;
-//    bool b = digitalRead(BTN_PIN_B)==LOW;
-//    bool c = digitalRead(BTN_PIN_C)==LOW;
-//    if(a+b+c>1) { 
+    //bool a = digitalRead(BTN_PIN_A)==LOW;
+    //bool b = digitalRead(BTN_PIN_B)==LOW;
+    //bool c = digitalRead(BTN_PIN_C)==LOW;
+    //if(a+b+c) { 
     if(digitalRead(BTN_PIN_C)==LOW) {
       //First pressed?
       if (!timer_pressed) {
